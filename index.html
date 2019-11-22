@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>todo</title>
+	<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+	  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+	  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+		<link rel="stylesheet" href="main.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container-fluid" id="todo-root"></div>
+
+	<script type="text/babel">
+		class Todo extends React.Component {
+			constructor(props){
+				super(props);
+				this.state = {items: [], text: ''};
+				this.handleChange = this.handleChange.bind(this);
+				this.handleSubmit = this.handleSubmit.bind(this);
+				this.handleDestroy = this.handleDestroy.bind(this);
+				this.handleChangeCheckbox = this.handleChangeCheckbox.bind(this);
+			}
+
+			handleChange(e){
+				this.setState({text: e.target.value});
+			}
+
+			handleSubmit(e){
+				e.preventDefault();
+				if (!this.state.text.length){
+					return;
+				}
+				const newItem = {
+					text: this.state.text,
+					id: Date.now(),
+					line: ' '
+				};
+				this.setState(state => ({
+					items: state.items.concat(newItem),
+					text: ''
+				}));
+			}
+
+			handleDestroy(id){
+				for (let i = 0; i <= this.state.items.length; i++) {
+					if(this.state.items[i].id == id.id){
+						this.state.items.splice(i,1);
+
+						this.setState((state) => ({
+								items: state.items
+							}));
+
+						return;
+					}
+				}
+			}
+
+			handleChangeCheckbox(e,id){
+
+				if(e.target.checked){
+					for (let i = 0; i <= this.state.items.length; i++) {
+						if(this.state.items[i].id == id){
+							this.state.items[i].line = 'linethrough';
+
+							this.setState((props) => ({
+									items: this.state.items
+								}));
+
+							return;
+						}
+					}
+				}else{
+					for (let i = 0; i <= this.state.items.length; i++) {
+						if(this.state.items[i].id == id){
+
+							this.state.items[i].line = '';
+
+							this.setState(props => ({
+								items: this.state.items
+							}));
+
+							return;
+						}
+					}
+				}
+			}
+
+
+			render() {
+				return (
+					<div className="container">
+					  <div className="row">
+					    <div className="col-sm-4">
+					    </div>
+					    <div className="col-sm-4">
+								<h1>Todo</h1>
+								<ul className='list'>
+									{this.state.items.map(item => (
+										<li key={item.id}>
+												<input type="checkbox" onChange={e => this.handleChangeCheckbox(e,item.id)}/>
+												<label className={item.line}>{item.text}</label>
+												<button onClick={(id) => this.handleDestroy({id: item.id})}>x</button>
+										</li>
+									))}
+								</ul>
+
+								<form onSubmit={this.handleSubmit}>
+									<input type='text' autoComplete="off" placeholder='What needs to be done?' id='new_todo' onChange={this.handleChange} value={this.state.text}/><br></br>
+									<button>Add</button> all: {this.state.items.length}
+								</form>
+					    </div>
+					    <div className="col-sm-4">
+					    </div>
+					  </div>
+					</div>
+
+				);
+			}
+
+		}
+
+		ReactDOM.render(<Todo autoComplete='off'/>, document.getElementById('todo-root'));
+	</script>
+
+</body>
+</html>
